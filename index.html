@@ -1,1 +1,56 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVH Genetic Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>AVH Genetic Calculator</h1>
+    <p>Predict your future foal's coat colors and genetics.</p>
+  </header>
+
+  <main>
+    <section class="parents">
+      <div class="horse-card">
+        <h2>Mare Genetics</h2>
+        <label for="mare-name">Mare Name</label>
+        <input id="mare-name" placeholder="Enter mare name">
+
+        <label for="mare-genes">Genetic Code</label>
+        <textarea id="mare-genes" rows="12"
+          placeholder="Bb&#10;Aa&#10;ww&#10;gg&#10;CRcr&#10;dd&#10;chch&#10;Ff&#10;zz&#10;RNRN"></textarea>
+      </div>
+
+      <div class="horse-card">
+        <h2>Stallion Genetics</h2>
+        <label for="stallion-name">Stallion Name</label>
+        <input id="stallion-name" placeholder="Enter stallion name">
+
+        <label for="stallion-genes">Genetic Code</label>
+        <textarea id="stallion-genes" rows="12"
+          placeholder="Bb&#10;aa&#10;ww&#10;gg&#10;CRcr&#10;dd&#10;chch&#10;ff&#10;zz&#10;rnrn"></textarea>
+      </div>
+    </section>
+
+    <button id="calculate-btn" type="button">
+      Calculate Foal Chances
+    </button>
+
+    <section id="results" aria-live="polite">
+      <h2>Foal Predictions</h2>
+      <p>Enter both parents' genetics to get started.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Unofficial fan-made genetic calculator for
+       A Virtual Horse (AVH).</p>
+  </footer>
+</body>
+</html>
+
