@@ -2,55 +2,618 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AVH Genetic Calculator</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVH Horse Genetics Calculator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+:root {
+  --green:#173e32;
+  --dark:#102a23;
+  --gold:#c4a268;
+  --cream:#f7f4eb;
+  --paper:#fffefa;
+  --text:#25372e;
+  --muted:#64746a;
+  --line:#dddcd1;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--cream);
+  color:var(--text);
+  font-family:"DM Sans",sans-serif;
+}
+header {
+  background:linear-gradient(135deg,var(--dark),var(--green));
+  border-bottom:5px solid var(--gold);
+  text-align:center;
+  color:white;
+  padding:55px 20px;
+}
+header h1 {
+  font:700 clamp(2rem,5vw,3.3rem) "Playfair Display",serif;
+  margin:0 0 12px;
+}
+header p { color:#dbe8dc; }
+main {
+  max-width:1200px;
+  padding:25px 18px;
+  margin:auto;
+}
+.intro {
+  text-align:center;
+  max-width:720px;
+  margin:15px auto 30px;
+  color:var(--muted);
+}
+.parents {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:22px;
+}
+.card {
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:25px;
+  box-shadow:0 5px 22px #173e320b;
+}
+h2,h3 {
+  font-family:"Playfair Display",serif;
+  color:var(--green);
+}
+h2 { margin-top:0; }
+.section-title {
+  border-bottom:1px solid var(--line);
+  padding-bottom:8px;
+  margin:25px 0 12px;
+  font-size:1.12rem;
+}
+.field-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.field { min-width:0; }
+label {
+  display:block;
+  font-weight:600;
+  font-size:.86rem;
+  margin-bottom:6px;
+}
+input,select {
+  display:block;
+  width:100%;
+  min-width:0;
+  padding:12px;
+  border:1px solid #ccd3ca;
+  border-radius:8px;
+  background:white;
+  color:var(--text);
+  font:inherit;
+}
+input:focus,select:focus {
+  outline:2px solid var(--gold);
+  outline-offset:1px;
+}
+.actions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  margin:32px 0;
+}
+button {
+  padding:14px 22px;
+  border-radius:9px;
+  font:600 1rem "DM Sans",sans-serif;
+  cursor:pointer;
+}
+.primary {
+  background:var(--green);
+  color:white;
+  border:2px solid var(--green);
+}
+.primary:hover { background:var(--dark); }
+.secondary {
+  background:white;
+  color:var(--green);
+  border:2px solid var(--green);
+}
+#results { margin-bottom:30px; }
+.result-section { margin-top:28px; }
+.result-item { margin:17px 0; }
+.result-row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-weight:600;
+  font-size:.92rem;
+  margin-bottom:7px;
+}
+.track {
+  height:11px;
+  background:#e8eee6;
+  border-radius:20px;
+  overflow:hidden;
+}
+.fill {
+  height:100%;
+  background:linear-gradient(90deg,var(--green),var(--gold));
+}
+.note {
+  padding:13px 16px;
+  background:#eef2eb;
+  border-left:3px solid var(--gold);
+  border-radius:5px;
+  font-size:.88rem;
+  line-height:1.6;
+  color:#46594c;
+}
+.small { color:var(--muted);font-size:.85rem; }
+.genotype-list {
+  max-height:340px;
+  overflow:auto;
+  padding:5px;
+}
+.genotype-entry {
+  border-bottom:1px solid var(--line);
+  padding:12px 3px;
+  font-size:.87rem;
+  overflow-wrap:anywhere;
+}
+.genotype-entry strong { color:var(--green); }
+footer {
+  text-align:center;
+  padding:25px;
+  color:var(--muted);
+  font-size:.82rem;
+}
+@media(max-width:750px) {
+  .parents { grid-template-columns:1fr; }
+  .card { padding:18px; }
+  .field-grid { gap:10px; }
+  header { padding:40px 16px; }
+}
+@media(max-width:360px) {
+  .field-grid { grid-template-columns:1fr; }
+}
+</style>
 </head>
 <body>
-  <header>
-    <h1>AVH Genetic Calculator</h1>
-    <p>Predict your future foal's coat colors and genetics.</p>
-  </header>
+<header>
+  <h1>AVH Genetics Calculator</h1>
+  <p>Discover the possibilities of your next foal.</p>
+</header>
 
-  <main>
-    <section class="parents">
-      <div class="horse-card">
-        <h2>Mare Genetics</h2>
-        <label for="mare-name">Mare Name</label>
-        <input id="mare-name" placeholder="Enter mare name">
+<main>
+  <p class="intro">
+    Select the genetic combinations of your mare and
+    stallion to calculate possible foal coat colors,
+    inherited patterns, and genotypes.
+  </p>
 
-        <label for="mare-genes">Genetic Code</label>
-        <textarea id="mare-genes" rows="12"
-          placeholder="Bb&#10;Aa&#10;ww&#10;gg&#10;CRcr&#10;dd&#10;chch&#10;Ff&#10;zz&#10;RNRN"></textarea>
-      </div>
-
-      <div class="horse-card">
-        <h2>Stallion Genetics</h2>
-        <label for="stallion-name">Stallion Name</label>
-        <input id="stallion-name" placeholder="Enter stallion name">
-
-        <label for="stallion-genes">Genetic Code</label>
-        <textarea id="stallion-genes" rows="12"
-          placeholder="Bb&#10;aa&#10;ww&#10;gg&#10;CRcr&#10;dd&#10;chch&#10;ff&#10;zz&#10;rnrn"></textarea>
-      </div>
+  <div class="parents">
+    <section class="card">
+      <h2>♀ Mare Genetics</h2>
+      <label for="mare-name">Horse Name</label>
+      <input id="mare-name" placeholder="Mare name">
+      <div id="mare-fields"></div>
     </section>
 
-    <button id="calculate-btn" type="button">
+    <section class="card">
+      <h2>♂ Stallion Genetics</h2>
+      <label for="stallion-name">Horse Name</label>
+      <input id="stallion-name" placeholder="Stallion name">
+      <div id="stallion-fields"></div>
+    </section>
+  </div>
+
+  <div class="actions">
+    <button class="primary" id="calculate">
       Calculate Foal Chances
     </button>
+    <button class="secondary" id="reset">
+      Reset Genetics
+    </button>
+  </div>
 
-    <section id="results" aria-live="polite">
-      <h2>Foal Predictions</h2>
-      <p>Enter both parents' genetics to get started.</p>
-    </section>
-  </main>
+  <section class="card" id="results" aria-live="polite">
+    <h2>Foal Predictions</h2>
+    <p class="small">
+      Select both parents' genetics and click Calculate.
+    </p>
+  </section>
+</main>
 
-  <footer>
-    <p>Unofficial fan-made genetic calculator for
-       A Virtual Horse (AVH).</p>
-  </footer>
+<footer>
+  Unofficial fan-made calculator for A Virtual Horse.
+  Not affiliated with AVH.
+</footer>
+
+<script>
+"use strict";
+
+// Every locus has exactly two inherited alleles.
+// Both allele orders are offered in the dropdowns.
+const LOCI = [
+  {id:"B",name:"Black / Chestnut",group:"Base Colors",a:["B","b"]},
+  {id:"A",name:"Agouti",group:"Base Colors",a:["A+","A","AT","a"]},
+  {id:"W",name:"White",group:"Base Colors",a:["W","w"]},
+  {id:"G",name:"Grey",group:"Base Colors",a:["G","g"]},
+  {id:"CR",name:"Cream",group:"Dilutions",a:["CR","cr"]},
+  {id:"D",name:"Dun",group:"Dilutions",a:["D","d"]},
+  {id:"CH",name:"Champagne",group:"Dilutions",a:["CH","ch"]},
+  {id:"F",name:"Flaxen",group:"Dilutions",a:["F","f"]},
+  {id:"Z",name:"Silver",group:"Dilutions",a:["Z","z"]},
+  {id:"RN",name:"Roan",group:"Patterns & Markings",a:["RN","rn"]},
+  {id:"RB",name:"Rabicano",group:"Patterns & Markings",a:["RB","rb"]},
+  {id:"ST",name:"Sooty",group:"Patterns & Markings",a:["ST","st"]},
+  {id:"TO",name:"Tobiano",group:"Patterns & Markings",a:["TO","to"]},
+  {id:"O",name:"Overo",group:"Patterns & Markings",a:["O","o"]},
+  {id:"SP",name:"Splash",group:"Patterns & Markings",a:["SP","sp"]},
+  {id:"LP",name:"Leopard",group:"Patterns & Markings",a:["LP","lp"]},
+  {id:"LK",name:"Blanket / Snowflake",group:"Patterns & Markings",a:["LK","lk"]},
+  {id:"TG",name:"Stripes",group:"Patterns & Markings",a:["TG","tg"]}
+];
+
+const PATTERNS = [
+  "RN","RB","ST","TO","O","SP","LP","LK","TG"
+];
+
+const LOCUS = Object.fromEntries(LOCI.map(x=>[x.id,x]));
+
+function orderedPairs(alleles) {
+  return alleles.flatMap(a=>alleles.map(b=>[a,b]));
+}
+
+function buildFields(parent) {
+  const root = document.getElementById(parent+"-fields");
+  let currentGroup = "";
+  let grid;
+
+  for (const locus of LOCI) {
+    if (locus.group !== currentGroup) {
+      currentGroup = locus.group;
+      const title = document.createElement("h3");
+      title.className = "section-title";
+      title.textContent = currentGroup;
+      root.append(title);
+
+      grid = document.createElement("div");
+      grid.className = "field-grid";
+      root.append(grid);
+    }
+
+    const field = document.createElement("div");
+    field.className = "field";
+
+    const label = document.createElement("label");
+    label.htmlFor = parent+"-"+locus.id;
+    label.textContent = locus.name;
+
+    const select = document.createElement("select");
+    select.id = label.htmlFor;
+
+    for (const pair of orderedPairs(locus.a)) {
+      const option = document.createElement("option");
+      option.value = pair.join("|");
+      option.textContent = pair.join("");
+      select.append(option);
+    }
+
+    // Neutral defaults: no modifiers, chestnut base.
+    const recessive = locus.a.at(-1);
+    select.value = recessive+"|"+recessive;
+
+    field.append(label,select);
+    grid.append(field);
+  }
+}
+
+buildFields("mare");
+buildFields("stallion");
+
+function readHorse(parent) {
+  const result = {};
+  for (const locus of LOCI) {
+    result[locus.id] = document
+      .getElementById(parent+"-"+locus.id)
+      .value.split("|");
+  }
+  return result;
+}
+
+function inherit(mare,stallion) {
+  const map = new Map();
+
+  for (const m of mare) {
+    for (const s of stallion) {
+      const pair = [m,s];
+      const key = pair.join("|");
+      const old = map.get(key);
+      if (old) old.p += .25;
+      else map.set(key,{pair,p:.25});
+    }
+  }
+  return [...map.values()];
+}
+
+function active(pair,allele) {
+  return pair.includes(allele);
+}
+
+function copies(pair,allele) {
+  return pair.filter(a=>a===allele).length;
+}
+
+function baseColor(g) {
+  if (!active(g.B,"B")) return "Chestnut";
+
+  // Provisional AVH agouti dominance hierarchy.
+  const order = ["A+","A","AT","a"];
+  const strongest = order.find(x=>active(g.A,x));
+
+  if (strongest==="A+") return "Wild Bay";
+  if (strongest==="A") return "Bay";
+  if (strongest==="AT") return "Seal Brown";
+  return "Black";
+}
+
+// Phenotype mapping: AVH documented rules plus
+// provisional names for combinations not fully documented.
+function coatColor(g) {
+  if (active(g.W,"W")) return "White";
+  if (active(g.G,"G")) return "Grey";
+
+  const base = baseColor(g);
+  const cr = copies(g.CR,"CR");
+  const dun = active(g.D,"D");
+  const ch = active(g.CH,"CH");
+  const silver = active(g.Z,"Z");
+  const roan = active(g.RN,"RN");
+
+  const bay = base==="Bay" || base==="Wild Bay";
+  let color = base;
+
+  if (ch && cr===1 && base==="Black") {
+    color = "Classic Cream";
+  } else if (ch && cr===1 && base==="Chestnut") {
+    color = "Gold Cream";
+  } else if (ch && cr>0) {
+    color = base+" + Cream + Champagne (unverified)";
+  } else if (ch) {
+    if (base==="Black") color="Classic Champagne";
+    else if (base==="Chestnut") color="Gold Champagne";
+    else if (base==="Seal Brown") color="Sable Champagne";
+    else color="Amber Champagne";
+  } else if (cr===2) {
+    if (base==="Chestnut") color="Cremello";
+    else if (base==="Black") color="Smoky Cream";
+    else if (base==="Seal Brown") color="Seal Brown Cream";
+    else if (bay) color="Perlino";
+  } else if (cr===1) {
+    if (base==="Chestnut") color="Palomino";
+    else if (base==="Black") color="Smoky Black";
+    else if (base==="Seal Brown") color="Diluted Seal Brown";
+    else if (bay) color="Buckskin";
+  }
+
+  if (dun) {
+    if (color==="Palomino") color="Dunalino";
+    else if (color==="Smoky Black") color="Smoky Grulla";
+    else if (color==="Perlino") color="Perlino Dun";
+    else if (color==="Buckskin") color="Dunskin";
+    else if (color==="Black") color="Grulla";
+    else if (color==="Chestnut") color="Red Dun";
+    else if (bay && cr===0 && !ch) color="Bay Dun";
+    else color+=" + Dun (unverified)";
+  }
+
+  if (silver && bay && !ch) {
+    if (color==="Buckskin") color="Silver Dapple Buckskin";
+    else if (color==="Dunskin") color="Silver Dapple Dunskin";
+    else if (color==="Bay" || color==="Wild Bay") {
+      color="Silver Dapple Bay";
+    } else if (color!=="Perlino" && color!=="Perlino Dun") {
+      color+=" + Silver (unverified)";
+    }
+  } else if (silver && base==="Black" && !ch) {
+    color+=" + Silver (unverified)";
+  }
+
+  if (roan) color+=" Roan";
+  return color;
+}
+
+function createBar(label,probability) {
+  const item = document.createElement("div");
+  item.className="result-item";
+
+  const row = document.createElement("div");
+  row.className="result-row";
+
+  const name = document.createElement("span");
+  name.textContent=label;
+
+  const value = document.createElement("span");
+  value.textContent=(probability*100).toFixed(2)+"%";
+
+  row.append(name,value);
+
+  const track = document.createElement("div");
+  track.className="track";
+  const fill = document.createElement("div");
+  fill.className="fill";
+  fill.style.width=(probability*100)+"%";
+  track.append(fill);
+
+  item.append(row,track);
+  return item;
+}
+
+function heading(text) {
+  const h = document.createElement("h3");
+  h.className="section-title";
+  h.textContent=text;
+  return h;
+}
+
+function note(text) {
+  const p = document.createElement("p");
+  p.className="note";
+  p.textContent=text;
+  return p;
+}
+
+function calculate() {
+  const mare=readHorse("mare");
+  const stallion=readHorse("stallion");
+  const results=document.getElementById("results");
+
+  const options={};
+  for (const locus of LOCI) {
+    options[locus.id]=inherit(
+      mare[locus.id],stallion[locus.id]
+    );
+  }
+
+  // Only color-relevant loci are enumerated together.
+  // Pattern loci are calculated separately, avoiding
+  // exponential combinations across all 18 genes.
+  const colorIds=[
+    "B","A","W","G","CR","D","CH","Z","RN"
+  ];
+  const colors=new Map();
+  const current={};
+
+  function explore(index,p) {
+    if (index===colorIds.length) {
+      const color=coatColor(current);
+      colors.set(color,(colors.get(color)||0)+p);
+      return;
+    }
+    const id=colorIds[index];
+    for (const outcome of options[id]) {
+      current[id]=outcome.pair;
+      explore(index+1,p*outcome.p);
+    }
+  }
+  explore(0,1);
+
+  results.replaceChildren();
+
+  const title=document.createElement("h2");
+  title.textContent="Foal Predictions";
+  results.append(title);
+
+  const mareName=document.getElementById("mare-name").value.trim();
+  const stallionName=document.getElementById("stallion-name").value.trim();
+
+  const pairing=document.createElement("p");
+  pairing.className="small";
+  pairing.textContent=(mareName||"Mare")+" × "+
+    (stallionName||"Stallion");
+  results.append(pairing);
+
+  results.append(heading("Coat Color Probabilities"));
+
+  const sorted=[...colors].sort((a,b)=>b[1]-a[1]);
+  for (const [color,p] of sorted) {
+    results.append(createBar(color,p));
+  }
+
+  results.append(note(
+    "Coat color names use the AVH information supplied " +
+    "so far. Some combined colors, agouti dominance " +
+    "rules, and roan naming are not yet verified."
+  ));
+
+  results.append(heading("Pattern & Modifier Inheritance"));
+
+  for (const id of PATTERNS) {
+    const locus=LOCUS[id];
+    const p=options[id]
+      .filter(o=>active(o.pair,locus.a[0]))
+      .reduce((sum,o)=>sum+o.p,0);
+
+    results.append(createBar(
+      locus.name+" ("+id+")",p
+    ));
+  }
+
+  // Flaxen is included as a separately reported modifier.
+  const flaxen=options.F
+    .filter(o=>active(o.pair,"F"))
+    .reduce((sum,o)=>sum+o.p,0);
+  results.append(createBar("Flaxen (F)",flaxen));
+
+  results.append(note(
+    "Pattern percentages represent the chance of " +
+    "inheriting at least one uppercase allele, not a " +
+    "guarantee of visible markings. Expression rules " +
+    "are provisional and require AVH verification."
+  ));
+
+  results.append(heading("Possible Foal Genotypes"));
+
+  const details=document.createElement("details");
+  const summary=document.createElement("summary");
+  summary.textContent="View inheritance probabilities by gene";
+  details.append(summary);
+
+  const list=document.createElement("div");
+  list.className="genotype-list";
+
+  for (const locus of LOCI) {
+    const entry=document.createElement("div");
+    entry.className="genotype-entry";
+
+    const name=document.createElement("strong");
+    name.textContent=locus.name+": ";
+    entry.append(name);
+
+    // Group reversed allele orders as equivalent.
+    const grouped=new Map();
+    for (const outcome of options[locus.id]) {
+      const pair=[...outcome.pair].sort(
+        (a,b)=>locus.a.indexOf(a)-locus.a.indexOf(b)
+      );
+      const key=pair.join("");
+      grouped.set(key,(grouped.get(key)||0)+outcome.p);
+    }
+
+    const text=document.createElement("span");
+    text.textContent=[...grouped]
+      .map(([key,p])=>key+" "+(p*100).toFixed(2)+"%")
+      .join(" | ");
+    entry.append(text);
+    list.append(entry);
+  }
+
+  details.append(list);
+  results.append(details);
+}
+
+document.getElementById("calculate")
+  .addEventListener("click",calculate);
+
+document.getElementById("reset")
+  .addEventListener("click",()=>{
+    document.querySelectorAll("select").forEach(select=>{
+      const locusId=select.id.split("-").slice(1).join("-");
+      const locus=LOCUS[locusId];
+      const r=locus.a.at(-1);
+      select.value=r+"|"+r;
+    });
+    document.querySelectorAll("input").forEach(x=>x.value="");
+    document.getElementById("results").replaceChildren();
+    const h=document.createElement("h2");
+    h.textContent="Foal Predictions";
+    document.getElementById("results").append(h);
+  });
+</script>
 </body>
 </html>
-
